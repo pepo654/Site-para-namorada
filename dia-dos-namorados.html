@@ -85,6 +85,9 @@
             color: #ff6b8b;
             font-style: italic;
             z-index: 1;
+            text-align: center;
+            padding: 20px;
+            width: 100%;
         }
         
         .photo-frame img.loaded {
@@ -246,16 +249,16 @@
             <p class="subtitle">Feliz Dia dos Namorados, meu amor! <span class="heart">❤️</span></p>
         </header>
         
-        <div class="photo-container">
-            <div class="photo-frame"> 
-                <div class="placeholder-text">Carregando nossa foto...</div>
-                <img id="photo1" src="https://drive.google.com/file/d/17kVCYu1UOsEYmj8evck3pf_DvTUm5Cui/view?usp=drive_link" alt="Nossa foto 1" onerror="this.style.display='none'; document.querySelector('#photo1 + .placeholder-text').textContent='Foto não carregada'">
-            </div>
-            <div class="photo-frame">
-                <div class="placeholder-text">Carregando nossa foto...</div>
-                <img id="photo2" src="https://drive.google.com/file/d/1EUf3RN6wCUTPspF5D06zX3wU0qIewtaa/view?usp=drive_link" alt="Nossa foto 2" onerror="this.style.display='none'; document.querySelector('#photo2 + .placeholder-text').textContent='Foto não carregada'">
-            </div>
-        </div>
+   <div class="photo-container">
+    <div class="photo-frame">
+        <img id="photo1" src="https://drive.google.com/thumbnail?sz=w1000&id=17kVCYu1UOsEYmj8evck3pf_DvTUm5Cui" alt="Nossa foto 1">
+        <div class="placeholder-text">Carregando nossa foto...</div>
+    </div>
+    <div class="photo-frame">
+        <img id="photo2" src="https://drive.google.com/thumbnail?sz=w1000&id=1EUf3RN6wCUTPspF5D06zX3wU0qIewtaa" alt="Nossa foto 2">
+        <div class="placeholder-text">Carregando nossa foto...</div>
+    </div>
+</div>
         
         <div class="message-box">
             <h2>Para minha gatinha</h2>
@@ -299,12 +302,29 @@
         document.addEventListener('DOMContentLoaded', function() {
             const images = document.querySelectorAll('.photo-frame img');
             images.forEach(img => {
+                // Força o carregamento
+                img.loading = 'eager';
+                
                 img.onload = function() {
                     this.classList.add('loaded');
                     this.nextElementSibling.style.display = 'none';
                 };
-                // Força o carregamento caso a imagem já esteja em cache
-                if (img.complete) img.onload();
+                
+                img.onerror = function() {
+                    this.style.display = 'none';
+                    const placeholder = this.nextElementSibling;
+                    placeholder.textContent = 'Foto não carregada';
+                    placeholder.style.display = 'block';
+                };
+                
+                // Dispara o evento se a imagem já estiver carregada
+                if (img.complete) {
+                    if (img.naturalWidth > 0) {
+                        img.onload();
+                    } else {
+                        img.onerror();
+                    }
+                }
             });
         });
         
